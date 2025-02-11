@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-^!c%cg!3on@&kjmc8n7os$=*as1(ed4)^44c+3^m*u9^kj$mlt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.1.8.59']
+ALLOWED_HOSTS = ['192.168.30.18']
 
 
 # Application definition
@@ -141,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 CORS_ALLOW_ALL_ORIGINS = False  # Har qanday domenga ruxsatni o'chirish
 
 CORS_ALLOWED_ORIGINS = [
-    "http://10.1.8.59",  # www versiyasi, agar kerak bo'lsa
+    "http://192.168.30.18",  # www versiyasi, agar kerak bo'lsa
 
     # Yana kerakli domenlarni shu yerga qo'shing
 ]
