@@ -22,7 +22,7 @@ from django.views.generic import RedirectView
 from .yasg import urlpatterns as doc_url
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('todo/',include("tasklist.urls"),name='acc'),
+    path('task/',include("tasklist.urls"),name='acc'),
     path('', RedirectView.as_view(url='/swagger/', permanent=True)),
 ]
 urlpatterns += doc_url
