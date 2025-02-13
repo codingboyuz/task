@@ -37,10 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # package
     'rest_framework',
     'corsheaders',
     'drf_yasg',
+    # local app
     'tasklist',
+    'subtask',
     'shared',
 
 ]

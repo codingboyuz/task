@@ -1,12 +1,11 @@
-from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from tasklist.models import Task, SubTask
-from django.core.cache import cache
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from tasklist.serializer import TaskSerializer, SubTaskSerializer, SubTaskCreateSerializer
+from tasklist.models import Task
+from tasklist.serializer import TaskSerializer
 
 
 class TaskListApiView(APIView):
@@ -53,47 +52,67 @@ class TaskCreateApiView(APIView):
 
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
-class SubTaskCreateApiView(APIView):
-    @swagger_auto_schema(request_body=SubTaskCreateSerializer)
-    def post(self, request):
-
-        try:
-            serializer = SubTaskCreateSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                data = {
-                    'success': True,
-                    'message': "SubTask successfully created"
-                }
-                return Response(data=data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-
-            return Response(data=str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
-
-class SubTaskListApiView(APIView):
+class TaskPriorityFilterApiView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter(
+            'priority',
+            openapi.IN_QUERY,
+            description="Bu api yo'lining maqsadi tasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ])
     def get(self, request):
         try:
-            task = SubTask.objects.all().order_by("-created_time")
-            serializer = SubTaskSerializer(task, many=True)
+            # Priority parametresini olish
 
-            if serializer.data:
-                data = {
-                    'success': True,
-                    'data': serializer.data,
-                    'message': 'SubTask list successfully get'
-                }
-                return Response(data=data, status=status.HTTP_200_OK)
+            priority = request.query_params.get('priority')
+            if not priority:
+                return Response({"error": "Priority is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            tasks = Task.objects.filter(priority=priority)
+            serializer = TaskSerializer(tasks, many=True)
+
+            # Javobni shakllantirish
             data = {
-                'success': False,
-                'data': serializer.error_messages,
-                'message': 'SubTask list error get'
+                'success': True,
+                'data': serializer.data,
+                'message': f'Tasks filtered by priority: {priority}'
             }
-            return Response(data=data, status=status.HTTP_404_NOT_FOUND)
+            return Response(data=data, status=status.HTTP_200_OK)
+
         except Exception as e:
+            return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class TaskStatusFilterApiView(APIView):
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter(
+            'status',
+            openapi.IN_QUERY,
+            description="Bu api yo'lining maqsadi tasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ])
+    def get(self, request):
+        try:
+            # Priority parametresini olish
+
+            task_status = request.query_params.get('status')
+            if not task_status:
+                return Response({"error": "Status is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            tasks = Task.objects.filter(status=task_status)
+            serializer = TaskSerializer(tasks, many=True)
+
+            # Javobni shakllantirish
             data = {
-                'success': False,
-                'message': f'Exception {str(e)}'
+                'success': True,
+                'data': serializer.data,
+                'message': f'Tasks filtered by status: {task_status}'
             }
-            return Response(data=data, status=status.HTTP_404_NOT_FOUND)
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

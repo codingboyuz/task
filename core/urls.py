@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
 from django.views.generic import RedirectView
-
 from .yasg import urlpatterns as doc_url
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('task/',include("tasklist.urls"),name='acc'),
+    path('task/', include("tasklist.urls"), name='tasklist'),
+    path('subtask/', include("subtask.urls"), name='subtask'),
     path('', RedirectView.as_view(url='/swagger/', permanent=True)),
 ]
 urlpatterns += doc_url
