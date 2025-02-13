@@ -41,26 +41,15 @@ class SubTaskCreateSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        print("Validated Data:", validated_data)
-
         # Task ID tekshirish
         task_id = validated_data.pop('task', None)
-        print("###########################################task_id#################################################")
-        print(task_id)
-        print("############################################################################################")
         if not task_id:
             raise serializers.ValidationError({"task": "Task ID is required."})
 
         try:
-            print(
-                "###########################################task_id2#################################################")
-            print(task_id)
-            print("############################################################################################")
             # Task obyektini bazadan olish
             task = Task.objects.get(id=task_id)
-            print("############################################################################################")
-            print(task)
-            print("############################################################################################")
+
         except Task.DoesNotExist:
             raise serializers.ValidationError({"task": "Task not found."})
 
