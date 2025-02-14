@@ -1,15 +1,14 @@
-from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from subtask.models import SubTask
 from drf_yasg import openapi
-from subtask.serializer import SubTaskSerializer, SubTaskCreateSerializer
+from subtask.serializer import SubTaskSerializer, SubTaskCreateSerializer, SubTaskUpdateSerializer
 
 
 class SubTaskCreateApiView(APIView):
-    @swagger_auto_schema(request_body=SubTaskCreateSerializer)
+    # @swagger_auto_schema(request_body=SubTaskCreateSerializer)
     def post(self, request):
 
         try:
@@ -59,15 +58,15 @@ class SubTaskListApiView(APIView):
 
 
 class SubTaskPriorityFilterApiView(APIView):
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter(
-            'priority',
-            openapi.IN_QUERY,
-            description="Bu api yo'lining maqsadi subtasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ])
+    # @swagger_auto_schema(manual_parameters=[
+    #     openapi.Parameter(
+    #         'priority',
+    #         openapi.IN_QUERY,
+    #         description="Bu api yo'lining maqsadi subtasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
+    #         type=openapi.TYPE_STRING,
+    #         required=True
+    #     )
+    # ])
     def get(self, request):
         try:
             # Priority parametresini olish
@@ -92,15 +91,15 @@ class SubTaskPriorityFilterApiView(APIView):
 
 
 class SubTaskStatusFilterApiView(APIView):
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter(
-            'status',
-            openapi.IN_QUERY,
-            description="Bu api yo'lining maqsadi subtasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ])
+    # @swagger_auto_schema(manual_parameters=[
+    #     openapi.Parameter(
+    #         'status',
+    #         openapi.IN_QUERY,
+    #         description="Bu api yo'lining maqsadi subtasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
+    #         type=openapi.TYPE_STRING,
+    #         required=True
+    #     )
+    # ])
     def get(self, request):
         try:
             # Priority parametresini olish
@@ -125,32 +124,25 @@ class SubTaskStatusFilterApiView(APIView):
 
 
 class SubTaskUpdateAPIView(APIView):
+    # @swagger_auto_schema(request_body=SubTaskUpdateSerializer)
+    def put(self, request, id):
+        try:
+            subtask = SubTask.objects.get(id=id)
+        except SubTask.DoesNotExist:
+            return Response({'error': 'SubTask not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    @swagger_auto_schema(request_body=SubTaskCreateSerializer)
-    def put(self, request, id, fromat=None):
-        subtask = self.get_object(id)
-        serializer = SubTaskSerializer(subtask, data=request.data)
-
+        serializer = SubTaskUpdateSerializer(subtask, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @swagger_auto_schema(request_body=SubTaskCreateSerializer)
-    def patch(self, request, id, format=None):
-        subtask = self.get_object(id)
-        serializer = SubTaskSerializer(subtask, data=request.data, partial=True)  # partial=True for partial update
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({'message': 'SubTask updated successfully', 'data': serializer.data},
+                            status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SubTaskDeleteAPIView(APIView):
-    def delete(self, request, pk):
+    def delete(self, request, id):
         try:
-            sub_task = SubTask.objects.get(pk=pk)
+            sub_task = SubTask.objects.get(id=id)
         except SubTask.DoesNotExist:
             return Response({"error": "SubTask not found."}, status=status.HTTP_404_NOT_FOUND)
 

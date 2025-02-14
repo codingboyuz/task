@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from tasklist.models import Task
-from tasklist.serializer import TaskSerializer
+from tasklist.serializer import TaskSerializer, TaskUpdateSerializer
 
 
 class TaskListApiView(APIView):
@@ -35,7 +35,7 @@ class TaskListApiView(APIView):
             return Response(data=data, status=status.HTTP_404_NOT_FOUND)
 
 class TaskCreateApiView(APIView):
-    @swagger_auto_schema(request_body=TaskSerializer)
+    # @swagger_auto_schema(request_body=TaskSerializer)
     def post(self, request):
         try:
             serializer = TaskSerializer(data=request.data)
@@ -53,15 +53,15 @@ class TaskCreateApiView(APIView):
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskPriorityFilterApiView(APIView):
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter(
-            'priority',
-            openapi.IN_QUERY,
-            description="Bu api yo'lining maqsadi tasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ])
+    # @swagger_auto_schema(manual_parameters=[
+    #     openapi.Parameter(
+    #         'priority',
+    #         openapi.IN_QUERY,
+    #         description="Bu api yo'lining maqsadi tasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
+    #         type=openapi.TYPE_STRING,
+    #         required=True
+    #     )
+    # ])
     def get(self, request):
         try:
             # Priority parametresini olish
@@ -85,15 +85,15 @@ class TaskPriorityFilterApiView(APIView):
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class TaskStatusFilterApiView(APIView):
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter(
-            'status',
-            openapi.IN_QUERY,
-            description="Bu api yo'lining maqsadi tasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ])
+    # @swagger_auto_schema(manual_parameters=[
+    #     openapi.Parameter(
+    #         'status',
+    #         openapi.IN_QUERY,
+    #         description="Bu api yo'lining maqsadi tasklarni bajariladigan ->(low, medium, high)larni  filterlanib beradi",
+    #         type=openapi.TYPE_STRING,
+    #         required=True
+    #     )
+    # ])
     def get(self, request):
         try:
             # Priority parametresini olish
@@ -116,3 +116,28 @@ class TaskStatusFilterApiView(APIView):
         except Exception as e:
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class TaskUpdateAPIView(APIView):
+
+    def put(self, request, id):
+        try:
+            subtask = Task.objects.get(id=id)
+        except Task.DoesNotExist:
+            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = TaskUpdateSerializer(subtask, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Task updated successfully', 'data': serializer.data},
+                            status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TaskDeleteAPIView(APIView):
+    def delete(self, request, id):
+        try:
+            sub_task = Task.objects.get(id=id)
+        except Task.DoesNotExist:
+            return Response({"error": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        sub_task.delete()
+        return Response({"message": "Task deleted successfully."}, status=status.HTTP_204_NO_CONTENT)

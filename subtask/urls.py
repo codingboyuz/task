@@ -6,11 +6,11 @@ from subtask.views import *
 app_name = "SubTask"
 urlpatterns =[
 
-    path('create/',SubTaskCreateApiView.as_view(),name='subtask-create'),
-    path('list/',SubTaskListApiView.as_view(),name='subtask-list'),
-    path('priority/',SubTaskPriorityFilterApiView.as_view(),name='priority'),
-    path('status/',SubTaskStatusFilterApiView.as_view(),name='sub_status'),
+    path('subtask/create/',SubTaskCreateApiView.as_view(),name='subtask-create'),
+    path('subtask/list/',SubTaskListApiView.as_view(),name='subtask-list'),
+    path('subtask/priority/',SubTaskPriorityFilterApiView.as_view(),name='priority'),
+    path('subtask/status/',SubTaskStatusFilterApiView.as_view(),name='sub_status'),
 
-    path('subtasks/', SubTaskUpdateAPIView.as_view(), name='subtask-update'),
-    path('delete/<uuid:pk>/',SubTaskDeleteAPIView.as_view(),name='sub_update'),
+    path('subtask/update/<uuid:id>/', SubTaskUpdateAPIView.as_view(), name='subtask-update'),
+    path('subtask/delete/<uuid:id>/',SubTaskDeleteAPIView.as_view(),name='sub_update'),
 ]

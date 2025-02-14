@@ -17,14 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
-from django.views.generic import RedirectView
-from .yasg import urlpatterns as doc_url
-
+from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView, SpectacularAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('task/', include("tasklist.urls"), name='tasklist'),
-    path('subtask/', include("subtask.urls"), name='subtask'),
-    path('', RedirectView.as_view(url='/swagger/', permanent=True)),
+    path('api/v1/', include("tasklist.urls"), name='tasklist'),
+    path('api/v1/', include("subtask.urls"), name='subtask'),
+
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+
+    path('swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # Redoc UI:
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
-urlpatterns += doc_url
+#     path('', RedirectView.as_view(url='/swagger/', permanent=True)),
